@@ -1,7 +1,5 @@
 """
-
 Cryptage avec Cesar
-
 """
 
 alphabet = "abcdefghijklmnopqrstuvwxyz"
