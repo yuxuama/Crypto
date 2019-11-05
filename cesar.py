@@ -1,5 +1,7 @@
 """
 Cryptage avec Cesar
+Fait par Alexandre (cette version)
+
 """
 
 alphabet = "abcdefghijklmnopqrstuvwxyz"
