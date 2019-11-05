@@ -4,12 +4,13 @@ Fait par Alexandre (cette version)
 
 """
 
-alphabet = "abcdefghijklmnopqrstuvwxyz"
+alphabetlower = "abcdefghijklmnopqrstuvwxyz"
+alphabetupper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 #fonction pour crypter
 def crypt():
 
-    motclear = input("Texte: ").lower()
+    motclear = input("Texte: ")
     key = int(input("Decallage: "))
     motcrypt = ''
 
@@ -17,10 +18,16 @@ def crypt():
         if letters == " ":
             motcrypt += ' '
             continue
-        chiffre = alphabet.index(letters) + key
-        if chiffre > 26 :
-            chiffre -=26
-        motcrypt += alphabet[chiffre]
+        if letters in alphabetlower:
+            chiffre = alphabetlower.index(letters) + key
+            if chiffre >= 26 :
+                chiffre -=26
+            motcrypt += alphabetlower[chiffre]
+        else:
+            chiffre = alphabetupper.index(letters) + key
+            if chiffre >= 26 :
+                chiffre -=26
+            motcrypt += alphabetupper[chiffre]
     print("Mot Crypt: ",motcrypt)
 
 
