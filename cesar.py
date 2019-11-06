@@ -70,6 +70,7 @@ def bruteforce():
     mot = input("Texte: ")
 
     for i in range(1,26):
+        print("")
         print("Key: ",i)
         uncrypt(mot, i)
 
