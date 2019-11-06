@@ -8,7 +8,7 @@ alphabetupper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 #fonction pour demander la key et le message
 def texte():
-    motclear = input("Texte: ")
+    mot = input("Texte: ")
     while True:
         try:
             key = int(input("Key: "))
@@ -17,23 +17,22 @@ def texte():
             elif key > 26:
                 while key > 26:
                     key -= 26
-                return motclear, key
+                return mot, key
             else:
-                return motclear, key
+                return mot, key
         except ValueError:
             print('Veuillez mettre un nombre supèrieur à 0')
             continue
 
 #fonction pour crypter
-def crypt(motclear, key):  
+def crypt(mot, key):  
  
     motcrypt = ''
 
-    for letters in motclear :
+    for letters in mot :
         if letters not in alphabetlower and letters not in  alphabetupper:
             motcrypt += letters
-            continue
-        if letters in alphabetlower:
+        elif letters in alphabetlower:
             chiffre = alphabetlower.index(letters) + key
             if chiffre >= 26 :
                 chiffre -=26
@@ -46,15 +45,14 @@ def crypt(motclear, key):
     print("Message Crypt: ",motcrypt)
 
 #fonction pour decrypter
-def uncrypt(motclear, key):
+def uncrypt(mot, key):
 
     motuncrypt = ''
 
-    for letters in motclear :
+    for letters in mot :
         if letters not in alphabetlower and letters not in alphabetupper:
             motuncrypt += letters
-            continue
-        if letters in alphabetlower:
+        elif letters in alphabetlower:
             chiffre = alphabetlower.index(letters) - key
             if chiffre <= -1 :
                 chiffre += 26
@@ -68,7 +66,11 @@ def uncrypt(motclear, key):
 
 #fonction pour bruteforce
 def bruteforce():
-    print("Pas encore fait")
+    mot = input("Texte: ")
+
+    for i in range(1,26):
+        print("Key: ",i)
+        uncrypt(mot, i)
 
 #fonction pour analyse statistic
 def statistic():
