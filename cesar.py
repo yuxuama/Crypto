@@ -4,7 +4,7 @@
 
 lowercase = "abcdefghijklmnopqrstuvwxyz"
 uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-special_char = "!?:;.,'éèàçù-"
+special_char = "!?:;.,'-êéèàçù"
 numbers = "0123456789"
 
 #French data base for statistic attack
@@ -39,7 +39,7 @@ def cesar_encrypt():
             new_index = (uppercase.index(char) + key) % 26
             crypted_message += uppercase[new_index]
         elif char in special_char:
-            new_index = (special_char.index(char) + key) % 13
+            new_index = (special_char.index(char) + key) % 14
             crypted_message += special_char[new_index]
         elif char in numbers:
             new_index = (numbers.index(char) + key) % 10
@@ -50,6 +50,8 @@ def cesar_encrypt():
 
 
 def cesar_uncrypt(chain, key):
+    if type(key) is not int or not 0<key<26:
+        raise ValueError("La clé de codage doit être un chiffre compris entre 0 et 26")
     decrypted_message = ''
     for char in chain:
         if char in lowercase:
@@ -59,7 +61,7 @@ def cesar_uncrypt(chain, key):
             new_indew = (uppercase.index(char) - key) % 26
             decrypted_message += uppercase[new_indew]
         elif char in special_char:
-            new_indew = (special_char.index(char) - key) % 13
+            new_indew = (special_char.index(char) - key) % 14
             decrypted_message += special_char[new_indew]
         elif char in numbers:
             new_indew = (numbers.index(char) - key) % 10
@@ -80,6 +82,9 @@ def cesar_bf(chain):
 ## Cryptography statistic analysis ##
 
 def cesar_cs(chain, error):
+    #Transform character into lowercase
+    chain = chain.lower()
+
     #Creation of work table
     work_table = [["Charactères"], \
                   ["Effectifs  "], \
@@ -87,14 +92,10 @@ def cesar_cs(chain, error):
                   ["Sugsestion "]]
     total_effectif = 0
 
-    #Transform all char in lowercase for statistic processing
-    for char in range(len(chain)):
-        chain[char].lower()
-
     #  Statistic Analysis  #
     for char in chain:
         if work_table[0].count(char) == 0:
-            if char != ' ':
+            if char != ' ' and not char in special_char:
                 work_table[0].append(char)
                 work_table[1].append(1)
         else:
@@ -115,7 +116,7 @@ def cesar_cs(chain, error):
     for index in range(1, len(work_table[0])):
         for base_i in range(len(base[0])):
             if base[1][base_i] - error < work_table[2][index] < base[1][base_i] + error:
-                proche = base[1][base_i]/work_table[2][index]
+                proche = work_table[2][index]/base[1][base_i]
                 sugested_char = base[0][base_i]
                 if maxi_proche[0] < proche:
                     maxi_proche[1] = sugested_char
@@ -124,54 +125,61 @@ def cesar_cs(chain, error):
         maxi_proche = [0, 'NA']
 
     #Display work_table
-    for x in range(4):
-        print(work_table[x])
+    for i in range(4):
+        for j in range(len(work_table[0])):
+            char = work_table[i][j]
+            if type(char) is str:
+                lenght = len(char)
+                if lenght < 6:
+                    char += ' '*(6-lenght)
+            elif type(char) is int or type(char) is float:
+                char = str(char)
+                lenght = len(char)
+                if lenght < 6:
+                    char += ' ' * (6 - lenght)
+            print("|", char, end='')
+        print('||')
+
 
 
 
 #Display of the menu
 print("=" * 60)
-print("1 Crypt")
-print("2 Uncrypt")
-print("3 Bruteforce")
-print("4 Crypto Analysis")
+print("1 Crypt", "             Crypt a message")
+print("2 Uncrypt", "           Uncrypt a message")
+print("3 Bruteforce", "        Attack with brute force")
+print("4 Crypto Analysis", "   Attack with statistic method")
 print("5 Quit")
 print("=" * 60)
 
 #Ask to user what he wants to do
 while 1:
-    will = int(input(">>> "))
+    try:
+        will = int(input(">>> "))
+    except ValueError:
+        print("Tu dois rentrer un chiffre entre 1 et 5")
+        continue
     if will == 1:
         message = cesar_encrypt()
         print(" ")
         print("======  Encoded message   ", "="*45)
         print(message)
-        print("="*70)
-        break
+        print("="*72)
     elif will == 2:
-        message = input("Quel message veux tu décrypter ")
-        print("======  Decoded solution  ", "="*50)
-        cesar_bf(message)
-        break
+        message = input("Quel message veux tu décrypter: ")
+        key = int(input("Quelle est la clé de décodage? "))
+        print("======  Decoded message  ", "="*50)
+        cesar_uncrypt(message)
     elif will == 3:
-        message = cesar_encrypt()
-        print(" ")
-        print("======  Encoded message   ", "="*45)
-        print(message)
-        print("="*70)
+        message = input("Quel message veux tu attaquer en brute force: ")
         print(" ")
         print("======  Decoded solution  ", "="*50)
         cesar_bf(message)
-        break
     elif will == 4:
-        message = cesar_encrypt()
-        print(" ")
-        print("======  Encoded message   ", "="*45)
-        print(message)
-        print("="*70)
+        message = input("Quel message veux tu attaquer en crypto statistique: ")
         print(" ")
         print("======  Crypto Analysis   ", "="*45)
-        cesar_cs(message, 0.5)
+        cesar_cs(message, 0.2)
         break
     elif will == 5:
         print("See you soon")
