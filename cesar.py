@@ -74,7 +74,22 @@ def bruteforce():
 
 #fonction pour analyse statistic
 def statistic():
-    print("Pas encore fait")
+
+    mot = input("Texte: ").lower()
+    liste = []
+
+    for letters in mot:
+        if letters not in alphabetlower:
+            continue
+        else:
+            liste.append(letters)
+    
+    for elements in alphabetlower:
+        pourcent = (liste.count(elements)/len(liste))*100
+        if pourcent > 0:
+            print(elements,"=",pourcent,"%")
+
+            
 
 #affichage menu
 print("="*60)
