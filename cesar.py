@@ -1,19 +1,14 @@
 """
 Cryptage avec Cesar
-Fait par Alexandre 
 
 """
 
 alphabetlower = "abcdefghijklmnopqrstuvwxyz"
 alphabetupper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-
-#fonction pour crypter
-def crypt():
-
+#fonction pour demander la key et le message
+def texte():
     motclear = input("Texte: ")
-    motcrypt = ''
-
     while True:
         try:
             key = int(input("Key: "))
@@ -22,12 +17,17 @@ def crypt():
             elif key > 26:
                 while key > 26:
                     key -= 26
-                break
+                return motclear, key
             else:
-                break
+                return motclear, key
         except ValueError:
             print('Veuillez mettre un nombre supèrieur à 0')
             continue
+
+#fonction pour crypter
+def crypt(motclear, key):  
+ 
+    motcrypt = ''
 
     for letters in motclear :
         if letters not in alphabetlower and letters not in  alphabetupper:
@@ -46,26 +46,10 @@ def crypt():
     print("Message Crypt: ",motcrypt)
 
 #fonction pour decrypter
-def uncrypt():
-   
-    motclear = input("Texte: ")
+def uncrypt(motclear, key):
+
     motuncrypt = ''
 
-    while True:
-        try:
-            key = int(input("Key: "))
-            if key < 0:
-                raise ValueError
-            elif key > 26:
-                while key > 26:
-                    key -= 26
-                break
-            else:
-                break
-        except ValueError:
-            print('Veuillez mettre un nombre supèrieur à 0')
-            continue
-    
     for letters in motclear :
         if letters not in alphabetlower and letters not in alphabetupper:
             motuncrypt += letters
@@ -99,17 +83,16 @@ print("4 Statistic")
 print("5 Quit")
 print("="*60)
 
-
 while True:
-    
     try:
         choix = int(input(">>> "))
-        
         if choix == 1:
-            crypt()
+            mot, key = texte()
+            crypt(mot, key)
             continue
         elif choix == 2:
-            uncrypt()
+            mot, key = texte()
+            uncrypt(mot, key)
             continue
         elif choix == 3:
             bruteforce()
