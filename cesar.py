@@ -17,6 +17,7 @@ def texte():
             elif key > 26:
                 while key > 26:
                     key -= 26
+                print("Key réduite: ",key)
                 return mot, key
             else:
                 return mot, key
