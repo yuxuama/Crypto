@@ -13,25 +13,42 @@ statistic_french_base = [['a','b','c','d','e','f','g','h','i','j','k','l','m','n
                          [7.11, 1.14, 3.18, 3.67, 12.10, 1.11, 1.23, 1.11, 6.59, 0.34, 0.29, 4.96, 2.62, 6.39, 5.02, 2.49, 0.65, 6.07, \
                           6.51, 5.92, 4.49, 1.11, 0.17, 0.38, 0.46, 0.15]]
 
+## Asking fonction ## Two mode 'c' for encryption and 'd' for decryption
+
+def ask(for_what):
+    while 1:
+        if for_what == 'c':
+            try:
+                key = int(input("Donne une clé de codage: "))
+                message = input("Donne le message que tu veux crypter: ")
+                if not 0 < key < 26:
+                    print("La clé de codage doit être un chiffre entre 1 et 25")
+                    continue
+                return message, key
+                break
+            except ValueError:
+                print("La clé de codage doit être un chiffre entre 1 et 25")
+                continue
+        elif for_what == 'd':
+            try:
+                key = int(input("Donne une clé de décodage: "))
+                message = input("Donne le message que tu veux décrypter: ")
+                if not 0 < key < 26:
+                    print("La clé de codage doit être un chiffre entre 1 et 25")
+                    continue
+                return message, key
+                break
+            except ValueError:
+                print("La clé de codage doit être un chiffre entre 1 et 25")
+                continue
 
 ##  Encoding a message with Cesar process  ##
 
-def cesar_encrypt():
-
-    # Asking for key
-    try:
-        key = int(input("Donne une clé de codage: "))
-        if not 0 < key < 26:      #Check if the key is in the range for a Cesar encode
-            raise ValueError("La clé de codage doit être comprise entre 0 et 26")
-    except ValueError:
-        raise ValueError("Tu dois entrer un chiffre")
-
-    #Asking for message
-    message = input("Donne le message que tu veux crypter: ")
+def cesar_encrypt(chain, key):
     crypted_message = ''
 
     #Crypt th message
-    for char in message:
+    for char in chain:
         if char in lowercase:
             new_index = (lowercase.index(char) + key) % 26
             crypted_message += lowercase[new_index]
@@ -50,8 +67,6 @@ def cesar_encrypt():
 
 
 def cesar_uncrypt(chain, key):
-    if type(key) is not int or not 0<key<26:
-        raise ValueError("La clé de codage doit être un chiffre compris entre 0 et 26")
     decrypted_message = ''
     for char in chain:
         if char in lowercase:
@@ -76,7 +91,7 @@ def cesar_bf(chain):
     decrypted_message = ''
     for i in range(1, 26):
         decrypted_message = cesar_uncrypt(chain, i)
-        print(decrypted_message, "    the key of encryption was: ", i)
+        print(decrypted_message, "    the key of encryption was: {0}".format(i))
 
 
 ## Cryptography statistic analysis ##
@@ -85,11 +100,11 @@ def cesar_cs(chain, error):
     #Transform character into lowercase
     chain = chain.lower()
 
-    #Creation of work table
+    #Creation of work table (statistic table)
     work_table = [["Charactères"], \
                   ["Effectifs  "], \
                   ["Fréquence  "], \
-                  ["Sugsestion "]]
+                  ["Suggestion "]]
     total_effectif = 0
 
     #  Statistic Analysis  #
@@ -110,21 +125,21 @@ def cesar_cs(chain, error):
                 else:
                     work_table[2].append(round((number / total_effectif) * 100, 2))
 
-    #Compare with data base
+    #Compare with data base #return the value of database that fit the well to computing frequences, if there is not: return 'NA'
     base = statistic_french_base
-    maxi_proche = [0, 'NA']
+    maxi_proche = [0, 'NA']   #Save var to chose the best char (see below)
     for index in range(1, len(work_table[0])):
         for base_i in range(len(base[0])):
-            if base[1][base_i] - error < work_table[2][index] < base[1][base_i] + error:
-                proche = work_table[2][index]/base[1][base_i]
+            if base[1][base_i] - error < work_table[2][index] < base[1][base_i] + error:    #testing if frequence value is in range
+                rapport = work_table[2][index]/base[1][base_i]    #Compute how close the two values are
                 sugested_char = base[0][base_i]
-                if maxi_proche[0] < proche:
+                if maxi_proche[0] < rapport:  #If precedent save quotient is smaller, redefine the suggested char value
                     maxi_proche[1] = sugested_char
-                maxi_proche[0] = max(maxi_proche[0], proche)
+                maxi_proche[0] = max(maxi_proche[0], rapport)
         work_table[3].append(maxi_proche[1])
         maxi_proche = [0, 'NA']
 
-    #Display work_table
+    #Display work_table with a clean print table
     for i in range(4):
         for j in range(len(work_table[0])):
             char = work_table[i][j]
@@ -145,44 +160,45 @@ def cesar_cs(chain, error):
 
 #Display of the menu
 print("=" * 60)
-print("1 Crypt", "             Crypt a message")
+print("1 Crypt", "             Crypt a message ")
 print("2 Uncrypt", "           Uncrypt a message")
 print("3 Bruteforce", "        Attack with brute force")
 print("4 Crypto Analysis", "   Attack with statistic method")
 print("5 Quit")
 print("=" * 60)
 
-#Ask to user what he wants to do
+#Ask to user what he wants to do couple until he quits
 while 1:
     try:
+        print(" ")
         will = int(input(">>> "))
     except ValueError:
         print("Tu dois rentrer un chiffre entre 1 et 5")
         continue
     if will == 1:
-        message = cesar_encrypt()
+        answer = ask('c')
         print(" ")
         print("======  Encoded message   ", "="*45)
-        print(message)
+        print(cesar_encrypt(answer[0], answer[1]))
         print("="*72)
     elif will == 2:
-        message = input("Quel message veux tu décrypter: ")
-        key = int(input("Quelle est la clé de décodage? "))
+        answer = ask('d')
+        print(" ")
         print("======  Decoded message  ", "="*50)
-        cesar_uncrypt(message)
+        print(cesar_uncrypt(answer[0], answer[1]))
+        print("=" * 72)
     elif will == 3:
         message = input("Quel message veux tu attaquer en brute force: ")
         print(" ")
         print("======  Decoded solution  ", "="*50)
         cesar_bf(message)
     elif will == 4:
-        message = input("Quel message veux tu attaquer en crypto statistique: ")
+        message = input("Quel message veux tu attaquer en cryptanalyse statistique: ")
         print(" ")
         print("======  Crypto Analysis   ", "="*45)
-        cesar_cs(message, 0.2)
-        break
+        cesar_cs(message, 1)
     elif will == 5:
         print("See you soon")
         break
     else:
-        print("Commande invalide")
+        print("Commande invalide, tu dois rentrer un nombre entre 1 et 5")
