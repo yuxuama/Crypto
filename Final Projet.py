@@ -195,11 +195,11 @@ def cesar_bf(chain):
 ####             Vigenere methods              ####
 ###################################################
 
-def vigenere_encrypt(mot, key):
+def vigenere_encrypt(chain, key):
     cmpt = 0
     motcrypt = ''
 
-    for letters in mot:
+    for letters in chain:
         if letters not in lowercase and letters not in uppercase:
             motcrypt += letters
         else:
@@ -215,11 +215,11 @@ def vigenere_encrypt(mot, key):
     return motcrypt
   
 #fonction pour decrypter
-def vigenere_uncrypt(mot, key):
+def vigenere_uncrypt(chain, key):
     cmpt = 0
     motcrypt = ''
 
-    for letters in mot:
+    for letters in chain:
         if letters not in lowercase and letters not in uppercase:
             motcrypt += letters
         else:
