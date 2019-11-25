@@ -17,7 +17,6 @@ numbers = "0123456789"
 statistic_french_base_c = [['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'], \
                          [7.11, 1.14, 3.18, 3.67, 12.10, 1.11, 1.23, 1.11, 6.59, 0.34, 0.29, 4.96, 2.62, 6.39, 5.02, 2.49, 0.65, 6.07, \
                           6.51, 5.92, 4.49, 1.11, 0.17, 0.38, 0.46, 0.15]]
-
 # For vigenere
 statistic_french_base_v = [['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'], \
                          [8.4, 1.06, 3.03, 4.18, 17.26, 1.12, 1.27, 0.92, 7.34, 0.31, 0.05, 6.01, 2.96, 7.13, 5.26, 3.01,0.99, 6.55, 8.08, 7.07, 5.74, 1.32, 0.04, 0.45, 0.3, 0.12]]
@@ -40,7 +39,7 @@ def user_interface():
     elif cmd == 2:
         vigenere_interface()
     elif cmd == 3:
-        print("Non disponible")
+        print("Non disponible (sorry T_T)")
     elif cmd == 4:
         print("See you soon")
 
@@ -94,10 +93,10 @@ def vigenere_interface():
     while 1:
         cmd = int(input(">>> "))
         if cmd == 1:
-            infos = ask("")
+            infos = ask("v")
             print("Crypted message: ", vigenere_encrypt(infos[0], infos[1]))
         elif cmd == 2:
-            infos = ask("")
+            infos = ask("v")
             print("Decrypted message: ", vigenere_uncrypt(infos[0], infos[1]))
         elif cmd == 3:
             print("Undefined for now")
@@ -131,10 +130,14 @@ def ask(method):
                 print("La clé doit être comprise entre 0 et 25")
                 continue
         else:
-            if not key in lowercase and not key in uppercase:
+            cmpt = 0
+            for letter in key:
+                if letter in lowercase or key in uppercase:
+                    cmpt += 1
+            if cmpt == len(key):
                 return message, key
             else:
-                print("La clé ne doit pas contenir de chiffre")
+                print("La clé doit être composée de lettres de l'alphabet")
                 continue
 
 ###############################################
@@ -189,8 +192,6 @@ def cesar_bf(chain):
         
 
 
-
-
 ###################################################
 ####             Vigenere methods              ####
 ###################################################
@@ -224,15 +225,15 @@ def vigenere_uncrypt(chain, key):
             motcrypt += letters
         else:
             if letters in lowercase:
-                chiffre = lowercase.index(letters) - lowercase.index(key[cmpt])
-                if chiffre <= -1:
-                    chiffre += 26
-                motcrypt += lowercase[chiffre]
+                number = lowercase.index(letters) - lowercase.index(key[cmpt])
+                if number <= -1:
+                    number += 26
+                motcrypt += lowercase[number]
             else:
-                chiffre = uppercase.index(letters) - lowercase.index(key[cmpt])
-                if chiffre <= -1:
-                    chiffre += 26
-                motcrypt += uppercase[chiffre]
+                number = uppercase.index(letters) - lowercase.index(key[cmpt])
+                if number <= -1:
+                    number += 26
+                motcrypt += uppercase[number]
 
             cmpt = (cmpt + 1) % len(key)
 
