@@ -12,7 +12,7 @@ uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 special_char = "!?:;.,'-êéèàçù"
 numbers = "0123456789"
 
-# French data base for statistic attack
+# French data base for statistic attack:
 # For cesar
 statistic_french_base_c = [['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'], \
                          [7.11, 1.14, 3.18, 3.67, 12.10, 1.11, 1.23, 1.11, 6.59, 0.34, 0.29, 4.96, 2.62, 6.39, 5.02, 2.49, 0.65, 6.07, \
@@ -39,13 +39,13 @@ def user_interface():
     elif cmd == 2:
         vigenere_interface()
     elif cmd == 3:
-        print("Non disponible (sorry T_T)")
+        beaufort_interface()
     elif cmd == 4:
         print("See you soon")
 
 # Interface for cesar encryption
 def cesar_interface():
-    #Display of the menu
+    #Display the menu
     print("=" * 55)
     print("1 Crypt", "              Crypt a message ")
     print("2 Uncrypt", "            Uncrypt a message")
@@ -61,7 +61,7 @@ def cesar_interface():
             print("Crypted message: ", cesar_encrypt(infos[0], infos[1]))
         elif cmd == 2:
             infos = ask("cesar")
-            print("Decrypted message: ", cesar_uncrypt(infos[0], infos[1]))
+            print("Decrypted message: ", cesar_decrypt(infos[0], infos[1]))
         elif cmd == 3:
             infos = input("Crypted message: ")
             cesar_bf(infos)
@@ -79,9 +79,8 @@ def cesar_interface():
             continue
  
 # Interface for vigenere encryption
-
 def vigenere_interface():  
-    #affichage menu
+    # Display the menu on console
     print("="*55)
     print("1 Crypt")
     print("2 Uncrypt")
@@ -97,7 +96,7 @@ def vigenere_interface():
             print("Crypted message: ", vigenere_encrypt(infos[0], infos[1]))
         elif cmd == 2:
             infos = ask("v")
-            print("Decrypted message: ", vigenere_uncrypt(infos[0], infos[1]))
+            print("Decrypted message: ", vigenere_decrypt(infos[0], infos[1]))
         elif cmd == 3:
             print("Undefined for now")
         elif cmd == 4:
@@ -112,12 +111,37 @@ def vigenere_interface():
         else:
             print("Invalid command")
             continue
-  
+
+# Interface for Beaufort encryption
+def beaufort_interface():
+    print("=" * 55)
+    print("1 Crypt")
+    print("2 Uncrypt")
+    print("3 Return to main menu")
+    print("4 Quit")
+    print("=" * 55)
+    while 1:
+        cmd = int(input(">>> "))
+        if cmd == 1:
+            infos = ask("v")
+            print("Crypted message: ", vigenere_decrypt(infos[0], infos[1]))  # We've just inverted the two method of vigenere in order to compute Beaufort's ones
+        elif cmd == 2:
+            infos = ask("v")
+            print("Decrypted message: ", vigenere_encrypt(infos[0], infos[1]))
+        elif cmd == 3:
+            user_interface()
+            break
+        elif cmd == 4:
+            print("See you soon :)")
+            break
+        else:
+            print("Invalid command")
+
 # Input method  
 def ask(method):
-    # Receive chain (method) -> it identifies rather cesar method or not
+    # Receive chain (method) -> it identifies rather cesar method or an other
     while 1:
-        message = input("Texte: ")
+        message = input("Text: ")
         key = input("Key: ")
         if method == "cesar":
             try:
@@ -132,7 +156,9 @@ def ask(method):
         else:
             cmpt = 0
             for letter in key:
-                if letter in lowercase or key in uppercase:
+                if letter in lowercase:
+                    cmpt += 1
+                elif letter in uppercase:
                     cmpt += 1
             if cmpt == len(key):
                 return message, key
@@ -145,9 +171,11 @@ def ask(method):
 ###############################################
 
 def cesar_encrypt(chain, key):
+    # Receive chain(string) = string to encrypt
+    # Receive key(int) = key with which "chain" will be encrypt
+    # Output = "crypted_message"(string)
     crypted_message = ''
 
-    #Crypt the message
     for char in chain:
         if char in lowercase:
             new_index = (lowercase.index(char) + key) % 26
@@ -166,8 +194,12 @@ def cesar_encrypt(chain, key):
     return crypted_message
 
 
-def cesar_uncrypt(chain, key):
+def cesar_decrypt(chain, key):
+    # Receive chain(string) = string to decrypt
+    # Receive key(int) = key with which "chain" will be decrypt
+    # Output = "decrypted_message"(string)
     decrypted_message = ''
+
     for char in chain:
         if char in lowercase:
             new_indew = (lowercase.index(char) - key) % 26
@@ -186,17 +218,21 @@ def cesar_uncrypt(chain, key):
     return decrypted_message
 
 def cesar_bf(chain):
+    # Receive chain(string) = string to attack
     for i in range(1, 26):
-        decrypted_message = cesar_uncrypt(chain, i)
+        decrypted_message = cesar_decrypt(chain, i)
         print(decrypted_message, "    the key of encryption was: {0}".format(i))
         
 
 
 ###################################################
-####             Vigenere methods              ####
+####        Vigenere encryption methods        ####
 ###################################################
 
 def vigenere_encrypt(chain, key):
+    # Receive chain(string) = string to encrypt
+    # Receive key(string) = key with which "chain" will be encrypt
+    # Output = "crypted_message"(string)
     cmpt = 0
     motcrypt = ''
 
@@ -208,15 +244,17 @@ def vigenere_encrypt(chain, key):
                 chiffre = (lowercase.index(letters) + lowercase.index(key[cmpt])) % 26
                 motcrypt += lowercase[chiffre]
             else:
-                chiffre = (uppercase.index(letters) + uppercase.index(key[cmpt])) % 26
+                chiffre = (uppercase.index(letters) + lowercase.index(key[cmpt])) % 26
                 motcrypt += uppercase[chiffre]
 
             cmpt = (cmpt + 1) % len(key)
 
     return motcrypt
-  
-#fonction pour decrypter
-def vigenere_uncrypt(chain, key):
+
+def vigenere_decrypt(chain, key):
+    # Receive chain(string) = string to decrypt
+    # Receive key(string) = key with which "chain" will be decrypt
+    # Output = "decrypted_message"(string)
     cmpt = 0
     motcrypt = ''
 
@@ -239,11 +277,16 @@ def vigenere_uncrypt(chain, key):
 
     return motcrypt
 
-###########################################
-####      Cryptanalyse statistique     ####
-###########################################
+###################################################
+####         Cryptanalyse statistique           ###
+###################################################
 
 def crypto_analyse_stats(chain, error, method):
+    # Input: chain(string) -> message we have to analyse
+    #        error(int) -> give the precision of the suggestion algorithm
+    #        method(string) -> is used to choose the correct database
+    # Output: built table in console with 4 rows (Charactère, Effectif, Fréquence et Suggestion)
+
     #Choose the database in function of the method used
     if method == "c":
         base = statistic_french_base_c
@@ -278,14 +321,14 @@ def crypto_analyse_stats(chain, error, method):
                 else:
                     work_table[2].append(round((number / total_effectif) * 100, 2))
 
-    #Compare with data base #return the value of database that fit the well to computing frequences, if there is not: return 'NA'
+    #Compare with data base # return the value of database that fit the best to computing frequences, if there is not: return 'NA'
     maxi_proche = [0, 'NA']   #Save var to choose the best char (see below)
     for index in range(1, len(work_table[0])):
         for base_i in range(len(base[0])):
             if base[1][base_i] - error < work_table[2][index] < base[1][base_i] + error:    #testing if frequence value is in range
                 rapport = work_table[2][index]/base[1][base_i]    #Compute how close the two values are
                 sugested_char = base[0][base_i]
-                if maxi_proche[0] < rapport:  #If precedent save quotient is smaller, redefine the suggested char value
+                if maxi_proche[0] < rapport:  # If precedent save quotient is smaller, redefine the suggested char value
                     maxi_proche[1] = sugested_char
                 maxi_proche[0] = max(maxi_proche[0], rapport)
         work_table[3].append(maxi_proche[1])
