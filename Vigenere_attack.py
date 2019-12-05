@@ -11,6 +11,9 @@ def vigenere_crack(chain=str):
     # Outputs: "decoded_chain"(string)
     #          "key"(string) -> key with which the message hes been coded
 
+    Decoded_message = ''
+    Key = ''
+    
     # Sort the char of Vigenere sequences in order to save only those which belong to "lowercase"
     chain = chain.lower()
     sorted_chain = ''
@@ -45,9 +48,31 @@ def vigenere_crack(chain=str):
                         repeated_chain[1].append(distance)
                         count += 1
                 else:
-                    break
-    print(repeated_chain)
+                    break   
 
+    ## Search for the length of the key  ##
+    factor_list = []
+    length_key = 0
+    maximum = [0, 0, 1]
+    # Computing all possible factor
+    for distance in range(len(repeated_chain[1])):
+        factor = decompose(repeated_chain[1][distance])
+        for number in factor:
+            factor_list.append(number)
+    for number_index in range(len(factor_list)):
+        count = factor_list.count(factor_list[number_index])
+        if count <= len(repeated_chain[1]):
+            maximum = [max(factor_list.count(count), length_key), number_index, 1]
+        elif count % len(repeated_chain[1]) == 0:
+            maximum = [max(factor_list.count(count), length_key), number_index, count/len(repeated_chain[1])]
+
+    length_key = factor_list[maximum[1]] ** maximum[2]
+    print(length_key, factor_list)
+
+
+
+
+# Method that decompose an integer into prime numbers
 def decompose(n=int):
     # Input: "n"(int) -> Number we want to decompose
     # Output: "decomposed_n"(list) -> Return all the prime number of the decomposition
@@ -65,13 +90,5 @@ def decompose(n=int):
     return decomposed_n
 
 
-
-vigenere_crack("KQOWEFVJPUJUUNUKGLMEKJINMWUXFQMKJBGWRLFNFGHUDWUUMBSVLPSNCMUEKQCTESWREEKOYSSIWCTUAXYOTAPXPLWPNTCGOJBGFQHTDWXIZAYGFFNSXCSEYNCTSSPNTUJNYTGGWZGRWUUNEJUUQEAPYMEKQHUIDUXFPGUYTSMTFFSHNUOCZGMRUWEYTRGKMEEDCTVRECFBDJQCUSWVBPNLGOYL \
-SKMTEFVJJTWWMFMWPNMEMTMHRSPXFSSKFFSTNUOCZGMDOEOYEEKCPJR \
-GPMURSKHFRSEIUEVGOYCWXIZAYGOSAANYDOEOYJLWUNHAMEBFELXYVL \
-WNOJNSIOFRWUCCESWKVIDGMUCGOCRUWGNMAAFFVNSIUDEKQHCEUCPFC \
-MPVSUDGAVEMNYMAMVLFMAOYFNTQCUAFVFJNXKLNEIWCWODCCULWRIFT \
-WGMUSWOVMATNYBUHTCOCWFYTNMGYTQMKBBNLGFBTWOJFTWGNTEJKNEE \
-DCLDHWTYYIDGMVRDGMPLSWGJLAGOEEKJOFEKUYTAANYTDWIYBNLNYNP \
-WEBFNLFYNAJEBFR")
-print(decompose(125))
+# Tests
+vigenere_crack("XAUNM EESYI EDTLL FGSNB WQUFX PQTYO RUTYI INUMQ IEULS MFAFX GUTYB XXAGB HMIFI IMUMQ IDEKR IFRIR ZQUHI ENOOO IGRML YETYO VQRYS IXEOK IYPYO IGRFB WPIYR BQURJ IYEMJ IGRYK XYACP PQSPB VESIR ZQRUF REDYJ IGRYK XBLOP JARNP UGEFB WMILX MZSMZ YXPNB PUMYZ MEEFB UGENL RDEPB JXONQ EZTMB WOEFI IPAHP PQBFL GDEMF WFAHQ")
