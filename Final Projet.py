@@ -14,12 +14,9 @@ numbers = "0123456789"
 
 # French data base for statistic attack:
 # For cesar
-statistic_french_base_c = [['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'], \
-                         [7.11, 1.14, 3.18, 3.67, 12.10, 1.11, 1.23, 1.11, 6.59, 0.34, 0.29, 4.96, 2.62, 6.39, 5.02, 2.49, 0.65, 6.07, \
-                          6.51, 5.92, 4.49, 1.11, 0.17, 0.38, 0.46, 0.15]]
+statistic_french_base_c = [7.11, 1.14, 3.18, 3.67, 12.10, 1.11, 1.23, 1.11, 6.59, 0.34, 0.29, 4.96, 2.62, 6.39, 5.02, 2.49, 0.65, 6.07,6.51, 5.92, 4.49, 1.11, 0.17, 0.38, 0.46, 0.15]
 # For vigenere
-statistic_french_base_v = [['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'], \
-                         [8.4, 1.06, 3.03, 4.18, 17.26, 1.12, 1.27, 0.92, 7.34, 0.31, 0.05, 6.01, 2.96, 7.13, 5.26, 3.01,0.99, 6.55, 8.08, 7.07, 5.74, 1.32, 0.04, 0.45, 0.3, 0.12]]
+statistic_french_base_v = [8.4, 1.06, 3.03, 4.18, 17.26, 1.12, 1.27, 0.92, 7.34, 0.31, 0.05, 6.01, 2.96, 7.13, 5.26, 3.01,0.99, 6.55, 8.08, 7.07, 5.74, 1.32, 0.04, 0.45, 0.3, 0.12]
 
 ####################################################
 ####            Interface Function              ####
@@ -67,7 +64,7 @@ def cesar_interface():
             cesar_bf(infos)
         elif cmd == 4:
             infos = input("Crypted message: ")
-            crypto_analyse_stats(infos, 1, "c")
+            crypto_analyse_stats(infos, 2, "c")
         elif cmd == 5:
             user_interface()
             break
@@ -101,7 +98,7 @@ def vigenere_interface():
             print("Undefined for now")
         elif cmd == 4:
             info = input("Crypted message: ")
-            crypto_analyse_stats(info, 1, "v")
+            crypto_analyse_stats(info, 2, "v")
         elif cmd == 5:
             user_interface()
             break
@@ -235,6 +232,7 @@ def vigenere_encrypt(chain, key):
     # Output = "crypted_message"(string)
     cmpt = 0
     motcrypt = ''
+    key = key.lower()
 
     for letters in chain:
         if letters not in lowercase and letters not in uppercase:
@@ -257,6 +255,7 @@ def vigenere_decrypt(chain, key):
     # Output = "decrypted_message"(string)
     cmpt = 0
     motcrypt = ''
+    key = key.lower()
 
     for letters in chain:
         if letters not in lowercase and letters not in uppercase:
@@ -321,13 +320,19 @@ def crypto_analyse_stats(chain, error, method):
                 else:
                     work_table[2].append(round((number / total_effectif) * 100, 2))
 
+    # Sort of the "worktable"  characteres in order to save only those which are in "lowercase"
+
+    for char in work_table[0]:
+        if not char == "Charactères" and not char in lowercase:
+            work_table[0].remove(char)
+
     #Compare with data base # return the value of database that fit the best to computing frequences, if there is not: return 'NA'
     maxi_proche = [0, 'NA']   #Save var to choose the best char (see below)
     for index in range(1, len(work_table[0])):
-        for base_i in range(len(base[0])):
-            if base[1][base_i] - error < work_table[2][index] < base[1][base_i] + error:    #testing if frequence value is in range
-                rapport = work_table[2][index]/base[1][base_i]    #Compute how close the two values are
-                sugested_char = base[0][base_i]
+        for base_i in range(len(base)):
+            if base[base_i] - error < work_table[2][index] < base[base_i] + error:    #testing if frequence value is in range
+                rapport = work_table[2][index]/base[base_i]    #Compute how close the two values are
+                sugested_char = lowercase[base_i]
                 if maxi_proche[0] < rapport:  # If precedent save quotient is smaller, redefine the suggested char value
                     maxi_proche[1] = sugested_char
                 maxi_proche[0] = max(maxi_proche[0], rapport)
