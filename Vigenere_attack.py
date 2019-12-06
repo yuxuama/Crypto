@@ -8,10 +8,9 @@ prime_numbers = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59,
 
 def vigenere_crack(chain=str):
     # Input: "chain"(string) -> It is the Vigenere coded message
-    # Outputs: "decoded_chain"(string)
-    #          "key"(string) -> key with which the message hes been coded
+    # Outputs: "Key"(string) -> key with which the message hes been coded
 
-    Decoded_message = ''
+
     Key = ''
     
     # Sort the char of Vigenere sequences in order to save only those which belong to "lowercase"
@@ -21,12 +20,14 @@ def vigenere_crack(chain=str):
         if char in lowercase:
             sorted_chain = sorted_chain + char
 
+    ##  Search for repeted sequences  ##
+
     # Algorythm that remark the repetition of the text and compute their distance
     repeated_chain = [[], []]  # Var which will save the repeated chains and their distances
     max_length = 6       # Set the max length of a repeated chain
     min_length = 3       # Set the min length of a repeated chain
     n_value = 3          # Set the number of value we want per length
-    for length in range(min_length, max_length+1):
+    for length in range(min_length, max_length+1): # Do the process for all size of sequences
         count = 0
         for x in range(len(sorted_chain)):
             if count >= n_value:
@@ -52,6 +53,7 @@ def vigenere_crack(chain=str):
     
     if len(repeated_chain[0]) == 0:
         return "Pas de répétition, on ne peut pas décoder ce message..."
+
 
     ## Search for the length of the key  ##
     factor_list_rough = []
@@ -79,7 +81,7 @@ def vigenere_crack(chain=str):
     
     
     for x in range(length_key):
-        treated_chain = ''.join(sorted_chain[x+b*length_key] for b in range(int(len(sorted_chain)/length_key)-1))
+        treated_chain = ''.join(sorted_chain[x+b*length_key] for b in range(int(len(sorted_chain)/length_key)-1)) # Generate the text from index x and then x + b*length
         saved_frequences = [[], []]
         for char in treated_chain:
             if saved_frequences[0].count(char) == 0:
@@ -87,8 +89,14 @@ def vigenere_crack(chain=str):
                 saved_frequences[1].append(treated_chain.count(char))
         index_string = saved_frequences[1].index(max(saved_frequences[1]))
         max_char = saved_frequences[0][index_string]
-        if lowercase.index(max_char) > lowercase.index('e'):
+        print(saved_frequences)
+        if lowercase.index(max_char) >= lowercase.index('e'):
             index = lowercase.index(max_char) - lowercase.index('e')
+            print(lowercase.index(max_char))
+            Key = Key + (lowercase[index])
+        else:
+            index = 26 - lowercase.index('e') + lowercase.index(max_char)
+            print(lowercase.index(max_char),index)
             Key = Key + (lowercase[index])
     return Key
         
@@ -120,16 +128,3 @@ def sort(table):
                 table.remove(things)
     return table
     
-# Tests
-print(vigenere_crack("KQOWEFVJPUJUUNUKGLMEKJINMWUXFQMKJBGWRLFNFGHUDWUUMBSVLPS\
-NCMUEKQCTESWREEKOYSSIWCTUAXYOTAPXPLWPNTCGOJBGFQHTDWXIZA\
-YGFFNSXCSEYNCTSSPNTUJNYTGGWZGRWUUNEJUUQEAPYMEKQHUIDUXFP\
-GUYTSMTFFSHNUOCZGMRUWEYTRGKMEEDCTVRECFBDJQCUSWVBPNLGOYL\
-SKMTEFVJJTWWMFMWPNMEMTMHRSPXFSSKFFSTNUOCZGMDOEOYEEKCPJR\
-GPMURSKHFRSEIUEVGOYCWXIZAYGOSAANYDOEOYJLWUNHAMEBFELXYVL\
-WNOJNSIOFRWUCCESWKVIDGMUCGOCRUWGNMAAFFVNSIUDEKQHCEUCPFC\
-MPVSUDGAVEMNYMAMVLFMAOYFNTQCUAFVFJNXKLNEIWCWODCCULWRIFT\
-WGMUSWOVMATNYBUHTCOCWFYTNMGYTQMKBBNLGFBTWOJFTWGNTEJKNEE\
-DCLDHWTYYIDGMVRDGMPLSWGJLAGOEEKJOFEKUYTAANYTDWIYBNLNYNP\
-WEBFNLFYNAJEBFR"))
-     

@@ -5,8 +5,10 @@
    # Alexandre CORNET #
    # Matthieu LECOMTE #
 
-# Declaration of dedicated alphabet
+# Imports
+from Vigenere_attack import vigenere_crack
 
+# Declaration of dedicated alphabet
 lowercase = "abcdefghijklmnopqrstuvwxyz"
 uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 special_char = "!?:;.,'-êéèàçù"
@@ -81,7 +83,7 @@ def vigenere_interface():
     print("="*55)
     print("1 Crypt")
     print("2 Uncrypt")
-    print("3 Dictionnary attack (NA)")
+    print("3 Crack Vigenere (beta test)")
     print("4 Crypto Analysis")
     print("5 Return to main menu")
     print("6 Quit")
@@ -95,7 +97,10 @@ def vigenere_interface():
             infos = ask("v")
             print("Decrypted message: ", vigenere_decrypt(infos[0], infos[1]))
         elif cmd == 3:
-            print("Undefined for now")
+            info = input("Crypted message: ")
+            key = vigenere_crack(info)
+            print("The key was: ", key)
+            print("Decrypted message", vigenere_decrypt(info, key))
         elif cmd == 4:
             info = input("Crypted message: ")
             crypto_analyse_stats(info, 2, "v")
