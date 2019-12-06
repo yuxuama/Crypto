@@ -2,7 +2,17 @@
 ####      Vigenere Attack     ####
 ##################################
 
+# Declaration of dedicated variable
+# Alphabet
 lowercase = "abcdefghijklmnopqrstuvwxyz"
+special_a = "àâ"
+special_e = "éèê"
+special_u = "ùû"
+special_c = "ç"
+
+
+
+
 statistic_french_base_c = [7.11, 1.14, 3.18, 3.67, 12.10, 1.11, 1.23, 1.11, 6.59, 0.34, 0.29, 4.96, 2.62, 6.39, 5.02, 2.49, 0.65, 6.07,6.51, 5.92, 4.49, 1.11, 0.17, 0.38, 0.46, 0.15]
 prime_numbers = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
 
@@ -19,7 +29,14 @@ def vigenere_crack(chain=str):
     for char in chain:
         if char in lowercase:
             sorted_chain = sorted_chain + char
-
+        elif char in special_a:
+            sorted_chain = sorted_chain + "a"
+        elif char in special_e:
+            sorted_chain = sorted_chain + "e"
+        elif char in special_u:
+            sorted_chain = sorted_chain + "u"
+        elif char in special_c:
+            sorted_chain = sorted_chain + "c"
     ##  Search for repeted sequences  ##
 
     # Algorythm that remark the repetition of the text and compute their distance
@@ -50,14 +67,12 @@ def vigenere_crack(chain=str):
                         count += 1
                 else:
                     break 
-    
+
     if len(repeated_chain[0]) == 0:
         return "Pas de répétition, on ne peut pas décoder ce message..."
 
-
     ## Search for the length of the key  ##
     factor_list_rough = []
-    length_key = 0
     maximum = [0, 0]
     # Computing all possible factor
     for distance in range(len(repeated_chain[1])):
@@ -71,32 +86,31 @@ def vigenere_crack(chain=str):
         sort(factor)
         for number in factor:
             factor_list_rough.append(number)
+
     # Finding length of the key
     for factors in range(len(factor_list_rough)):  
         number = factor_list_rough[factors]
         if factor_list_rough.count(number) > maximum[0]:
             maximum = [factor_list_rough.count(number), factors]
    
-    length_key = factor_list_rough[maximum[1]] 
-    
+    length_key = factor_list_rough[maximum[1]]
     
     for x in range(length_key):
-        treated_chain = ''.join(sorted_chain[x+b*length_key] for b in range(int(len(sorted_chain)/length_key)-1)) # Generate the text from index x and then x + b*length
+        treated_chain = ''.join(sorted_chain[x+b*length_key] for b in range(int(len(sorted_chain)/length_key)-1)) # Generate the text from index x and then x + b*length (every step = length of the key)
         saved_frequences = [[], []]
         for char in treated_chain:
             if saved_frequences[0].count(char) == 0:
                 saved_frequences[0].append(char)
                 saved_frequences[1].append(treated_chain.count(char))
+        print(saved_frequences)
         index_string = saved_frequences[1].index(max(saved_frequences[1]))
         max_char = saved_frequences[0][index_string]
-        print(saved_frequences)
+        print(max_char)
         if lowercase.index(max_char) >= lowercase.index('e'):
             index = lowercase.index(max_char) - lowercase.index('e')
-            print(lowercase.index(max_char))
             Key = Key + (lowercase[index])
         else:
             index = 26 - lowercase.index('e') + lowercase.index(max_char)
-            print(lowercase.index(max_char),index)
             Key = Key + (lowercase[index])
     return Key
         
@@ -107,7 +121,10 @@ def decompose(n=int):
     # Output: "decomposed_n"(list) -> Return all the prime number of the decomposition
     diviseur_index = 0
     decomposed_n = []
+    count = 0
     while n > 2:
+        if count == 100:
+            return [n]
         number = prime_numbers[diviseur_index]
         if n % number == 0:
             decomposed_n.append(number)
@@ -116,6 +133,7 @@ def decompose(n=int):
             diviseur_index += 1
         else:
             diviseur_index = 0
+        count += 1
     return decomposed_n
 
 # Method that sort of the table in order to prevent from repetition of values
@@ -127,4 +145,3 @@ def sort(table):
             while table.count(things) > 1:
                 table.remove(things)
     return table
-    
