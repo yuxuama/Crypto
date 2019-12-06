@@ -48,29 +48,50 @@ def vigenere_crack(chain=str):
                         repeated_chain[1].append(distance)
                         count += 1
                 else:
-                    break   
+                    break 
+    
+    if len(repeated_chain[0]) == 0:
+        return "Pas de répétition, on ne peut pas décoder ce message..."
 
     ## Search for the length of the key  ##
-    factor_list = []
+    factor_list_rough = []
     length_key = 0
-    maximum = [0, 0, 1]
+    maximum = [0, 0]
     # Computing all possible factor
     for distance in range(len(repeated_chain[1])):
         factor = decompose(repeated_chain[1][distance])
+        basic_len = len(factor)
+        for number_index in range(basic_len):
+            for number_index2 in range(basic_len):
+                new_factor = factor[number_index] * factor[number_index2]
+                if factor.count(new_factor) == 0:
+                    factor.append(new_factor)
+        sort(factor)
         for number in factor:
-            factor_list.append(number)
-    for number_index in range(len(factor_list)):
-        count = factor_list.count(factor_list[number_index])
-        if count <= len(repeated_chain[1]):
-            maximum = [max(factor_list.count(count), length_key), number_index, 1]
-        elif count % len(repeated_chain[1]) == 0:
-            maximum = [max(factor_list.count(count), length_key), number_index, count/len(repeated_chain[1])]
-
-    length_key = factor_list[maximum[1]] ** maximum[2]
-    print(length_key, factor_list)
-
-
-
+            factor_list_rough.append(number)
+    # Finding length of the key
+    for factors in range(len(factor_list_rough)):  
+        number = factor_list_rough[factors]
+        if factor_list_rough.count(number) > maximum[0]:
+            maximum = [factor_list_rough.count(number), factors]
+   
+    length_key = factor_list_rough[maximum[1]] 
+    
+    
+    for x in range(length_key):
+        treated_chain = ''.join(sorted_chain[x+b*length_key] for b in range(int(len(sorted_chain)/length_key)-1))
+        saved_frequences = [[], []]
+        for char in treated_chain:
+            if saved_frequences[0].count(char) == 0:
+                saved_frequences[0].append(char)
+                saved_frequences[1].append(treated_chain.count(char))
+        index_string = saved_frequences[1].index(max(saved_frequences[1]))
+        max_char = saved_frequences[0][index_string]
+        if lowercase.index(max_char) > lowercase.index('e'):
+            index = lowercase.index(max_char) - lowercase.index('e')
+            Key = Key + (lowercase[index])
+    return Key
+        
 
 # Method that decompose an integer into prime numbers
 def decompose(n=int):
@@ -89,6 +110,26 @@ def decompose(n=int):
             diviseur_index = 0
     return decomposed_n
 
-
+# Method that sort of the table in order to prevent from repetition of values
+def sort(table):
+    # Input: "table"(list) -> List we want to sort
+    # Output: "table"(list) -> List without same values
+    for things in table:
+        if table.count(things) > 0:
+            while table.count(things) > 1:
+                table.remove(things)
+    return table
+    
 # Tests
-vigenere_crack("XAUNM EESYI EDTLL FGSNB WQUFX PQTYO RUTYI INUMQ IEULS MFAFX GUTYB XXAGB HMIFI IMUMQ IDEKR IFRIR ZQUHI ENOOO IGRML YETYO VQRYS IXEOK IYPYO IGRFB WPIYR BQURJ IYEMJ IGRYK XYACP PQSPB VESIR ZQRUF REDYJ IGRYK XBLOP JARNP UGEFB WMILX MZSMZ YXPNB PUMYZ MEEFB UGENL RDEPB JXONQ EZTMB WOEFI IPAHP PQBFL GDEMF WFAHQ")
+print(vigenere_crack("KQOWEFVJPUJUUNUKGLMEKJINMWUXFQMKJBGWRLFNFGHUDWUUMBSVLPS\
+NCMUEKQCTESWREEKOYSSIWCTUAXYOTAPXPLWPNTCGOJBGFQHTDWXIZA\
+YGFFNSXCSEYNCTSSPNTUJNYTGGWZGRWUUNEJUUQEAPYMEKQHUIDUXFP\
+GUYTSMTFFSHNUOCZGMRUWEYTRGKMEEDCTVRECFBDJQCUSWVBPNLGOYL\
+SKMTEFVJJTWWMFMWPNMEMTMHRSPXFSSKFFSTNUOCZGMDOEOYEEKCPJR\
+GPMURSKHFRSEIUEVGOYCWXIZAYGOSAANYDOEOYJLWUNHAMEBFELXYVL\
+WNOJNSIOFRWUCCESWKVIDGMUCGOCRUWGNMAAFFVNSIUDEKQHCEUCPFC\
+MPVSUDGAVEMNYMAMVLFMAOYFNTQCUAFVFJNXKLNEIWCWODCCULWRIFT\
+WGMUSWOVMATNYBUHTCOCWFYTNMGYTQMKBBNLGFBTWOJFTWGNTEJKNEE\
+DCLDHWTYYIDGMVRDGMPLSWGJLAGOEEKJOFEKUYTAANYTDWIYBNLNYNP\
+WEBFNLFYNAJEBFR"))
+     
