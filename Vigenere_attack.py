@@ -5,12 +5,6 @@
 # Declaration of dedicated variable
 # Alphabet
 lowercase = "abcdefghijklmnopqrstuvwxyz"
-special_a = "àâ"
-special_e = "éèê"
-special_u = "ùû"
-special_c = "ç"
-
-
 
 
 statistic_french_base_c = [7.11, 1.14, 3.18, 3.67, 12.10, 1.11, 1.23, 1.11, 6.59, 0.34, 0.29, 4.96, 2.62, 6.39, 5.02, 2.49, 0.65, 6.07,6.51, 5.92, 4.49, 1.11, 0.17, 0.38, 0.46, 0.15]
@@ -20,7 +14,6 @@ def vigenere_crack(chain=str):
     # Input: "chain"(string) -> It is the Vigenere coded message
     # Outputs: "Key"(string) -> key with which the message hes been coded
 
-
     Key = ''
     
     # Sort the char of Vigenere sequences in order to save only those which belong to "lowercase"
@@ -29,21 +22,14 @@ def vigenere_crack(chain=str):
     for char in chain:
         if char in lowercase:
             sorted_chain = sorted_chain + char
-        elif char in special_a:
-            sorted_chain = sorted_chain + "a"
-        elif char in special_e:
-            sorted_chain = sorted_chain + "e"
-        elif char in special_u:
-            sorted_chain = sorted_chain + "u"
-        elif char in special_c:
-            sorted_chain = sorted_chain + "c"
+
     ##  Search for repeted sequences  ##
 
     # Algorythm that remark the repetition of the text and compute their distance
     repeated_chain = [[], []]  # Var which will save the repeated chains and their distances
-    max_length = 6       # Set the max length of a repeated chain
-    min_length = 3       # Set the min length of a repeated chain
-    n_value = 3          # Set the number of value we want per length
+    max_length = 5       # Set the max length of a repeated chain
+    min_length = 2      # Set the min length of a repeated chain
+    n_value = 4          # Set the number of value we want per length
     for length in range(min_length, max_length+1): # Do the process for all size of sequences
         count = 0
         for x in range(len(sorted_chain)):
@@ -92,7 +78,9 @@ def vigenere_crack(chain=str):
         number = factor_list_rough[factors]
         if factor_list_rough.count(number) > maximum[0]:
             maximum = [factor_list_rough.count(number), factors]
-   
+
+    print(factor_list_rough)
+    print(repeated_chain)
     length_key = factor_list_rough[maximum[1]]
     
     for x in range(length_key):
@@ -108,10 +96,10 @@ def vigenere_crack(chain=str):
         print(max_char)
         if lowercase.index(max_char) >= lowercase.index('e'):
             index = lowercase.index(max_char) - lowercase.index('e')
-            Key = Key + (lowercase[index])
+            Key += (lowercase[index])
         else:
             index = 26 - lowercase.index('e') + lowercase.index(max_char)
-            Key = Key + (lowercase[index])
+            Key += (lowercase[index])
     return Key
         
 

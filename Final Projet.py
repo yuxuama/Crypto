@@ -11,7 +11,11 @@ from Vigenere_attack import vigenere_crack
 # Declaration of dedicated alphabet
 lowercase = "abcdefghijklmnopqrstuvwxyz"
 uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-special_char = "!?:;.,'-êéèàçù"
+special_char = "!?:;.,'-`"
+special_a = "àâ"
+special_e = "éèê"
+special_u = "ùû"
+special_c = "ç"
 numbers = "0123456789"
 
 # French data base for statistic attack:
@@ -100,7 +104,7 @@ def vigenere_interface():
             info = input("Crypted message: ")
             key = vigenere_crack(info)
             print("The key was: ", key)
-            print("Decrypted message", vigenere_decrypt(info, key))
+            print("Decrypted message: ", vigenere_decrypt(info, key))
         elif cmd == 4:
             info = input("Crypted message: ")
             crypto_analyse_stats(info, 2, "v")
@@ -185,12 +189,21 @@ def cesar_encrypt(chain, key):
         elif char in uppercase:
             new_index = (uppercase.index(char) + key) % 26
             crypted_message += uppercase[new_index]
-        elif char in special_char:
-            new_index = (special_char.index(char) + key) % 14
-            crypted_message += special_char[new_index]
         elif char in numbers:
             new_index = (numbers.index(char) + key) % 10
             crypted_message += numbers[new_index]
+        elif char in special_e:
+            new_index = (lowercase.index("e") + key) % 26
+            crypted_message += lowercase[new_index]
+        elif char in special_a:
+            new_index = (lowercase.index("a") + key) % 26
+            crypted_message += lowercase[new_index]
+        elif char in special_c:
+            new_index = (lowercase.index("c") + key) % 26
+            crypted_message += lowercase[new_index]
+        elif char in special_u:
+            new_index = (lowercase.index("u") + key) % 26
+            crypted_message += lowercase[new_index]
         else:
             crypted_message += char
     return crypted_message
@@ -209,9 +222,6 @@ def cesar_decrypt(chain, key):
         elif char in uppercase:
             new_indew = (uppercase.index(char) - key) % 26
             decrypted_message += uppercase[new_indew]
-        elif char in special_char:
-            new_indew = (special_char.index(char) - key) % 14
-            decrypted_message += special_char[new_indew]
         elif char in numbers:
             new_indew = (numbers.index(char) - key) % 10
             decrypted_message += numbers[new_indew]
@@ -240,17 +250,34 @@ def vigenere_encrypt(chain, key):
     key = key.lower()
 
     for letters in chain:
-        if letters not in lowercase and letters not in uppercase:
-            motcrypt += letters
-        else:
-            if letters in lowercase:
-                chiffre = (lowercase.index(letters) + lowercase.index(key[cmpt])) % 26
-                motcrypt += lowercase[chiffre]
-            else:
-                chiffre = (uppercase.index(letters) + lowercase.index(key[cmpt])) % 26
-                motcrypt += uppercase[chiffre]
-
+        if letters in lowercase:
+            number = (lowercase.index(letters) + lowercase.index(key[cmpt])) % 26
+            motcrypt += lowercase[number]
             cmpt = (cmpt + 1) % len(key)
+        elif letters in uppercase:
+            number = (uppercase.index(letters) + lowercase.index(key[cmpt])) % 26
+            motcrypt += uppercase[number]
+            cmpt = (cmpt + 1) % len(key)
+        elif letters in special_e:
+            number = (lowercase.index("e") + lowercase.index(key[cmpt])) % 26
+            motcrypt += lowercase[number]
+            cmpt = (cmpt + 1) % len(key)
+        elif letters in special_a:
+            number = (lowercase.index("a") + lowercase.index(key[cmpt])) % 26
+            motcrypt += lowercase[number]
+            cmpt = (cmpt + 1) % len(key)
+        elif letters in special_c:
+            number = (lowercase.index("c") + lowercase.index(key[cmpt])) % 26
+            motcrypt += lowercase[number]
+            cmpt = (cmpt + 1) % len(key)
+        elif letters in special_u:
+            number = (lowercase.index("u") + lowercase.index(key[cmpt])) % 26
+            motcrypt += lowercase[number]
+            cmpt = (cmpt + 1) % len(key)
+        else:
+            motcrypt += letters
+
+
 
     return motcrypt
 
@@ -263,21 +290,17 @@ def vigenere_decrypt(chain, key):
     key = key.lower()
 
     for letters in chain:
-        if letters not in lowercase and letters not in uppercase:
-            motcrypt += letters
-        else:
-            if letters in lowercase:
-                number = lowercase.index(letters) - lowercase.index(key[cmpt])
-                if number <= -1:
-                    number += 26
-                motcrypt += lowercase[number]
-            else:
-                number = uppercase.index(letters) - lowercase.index(key[cmpt])
-                if number <= -1:
-                    number += 26
-                motcrypt += uppercase[number]
-
+        if letters in lowercase:
+            number = (lowercase.index(letters) - lowercase.index(key[cmpt])) % 26
+            motcrypt += lowercase[number]
             cmpt = (cmpt + 1) % len(key)
+        elif letters in uppercase:
+            number = (uppercase.index(letters) - lowercase.index(key[cmpt])) % 26
+            motcrypt += uppercase[number]
+            cmpt = (cmpt + 1) % len(key)
+        else:
+            motcrypt += letters
+
 
     return motcrypt
 
