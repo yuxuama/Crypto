@@ -11,18 +11,13 @@ from Vigenere_attack import vigenere_crack
 # Declaration of dedicated alphabet
 lowercase = "abcdefghijklmnopqrstuvwxyz"
 uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-special_char = "!?:;.,'-`"
-special_a = "àâ"
-special_e = "éèê"
-special_u = "ùû"
-special_c = "ç"
+ponctuation = "!?:;.,'-’"
+special_char = dict(àâÀ="a", éèêÉÈ="e", ùûÙ="u", çÇ="c", î='i', ôÔ='o')
 numbers = "0123456789"
 
 # French data base for statistic attack:
-# For cesar
 statistic_french_base_c = [7.11, 1.14, 3.18, 3.67, 12.10, 1.11, 1.23, 1.11, 6.59, 0.34, 0.29, 4.96, 2.62, 6.39, 5.02, 2.49, 0.65, 6.07,6.51, 5.92, 4.49, 1.11, 0.17, 0.38, 0.46, 0.15]
-# For vigenere
-statistic_french_base_v = [8.4, 1.06, 3.03, 4.18, 17.26, 1.12, 1.27, 0.92, 7.34, 0.31, 0.05, 6.01, 2.96, 7.13, 5.26, 3.01,0.99, 6.55, 8.08, 7.07, 5.74, 1.32, 0.04, 0.45, 0.3, 0.12]
+
 
 ####################################################
 ####            Interface Function              ####
@@ -70,7 +65,7 @@ def cesar_interface():
             cesar_bf(infos)
         elif cmd == 4:
             infos = input("Crypted message: ")
-            crypto_analyse_stats(infos, 2, "c")
+            crypto_analyse_stats(infos, 5)
         elif cmd == 5:
             user_interface()
             break
@@ -88,9 +83,8 @@ def vigenere_interface():
     print("1 Crypt")
     print("2 Uncrypt")
     print("3 Crack Vigenere (beta test)")
-    print("4 Crypto Analysis")
-    print("5 Return to main menu")
-    print("6 Quit")
+    print("4 Return to main menu")
+    print("5 Quit")
     print("="*55)
     while 1:
         cmd = int(input(">>> "))
@@ -106,12 +100,9 @@ def vigenere_interface():
             print("The key was: ", key)
             print("Decrypted message: ", vigenere_decrypt(info, key))
         elif cmd == 4:
-            info = input("Crypted message: ")
-            crypto_analyse_stats(info, 2, "v")
-        elif cmd == 5:
             user_interface()
             break
-        elif cmd == 6:
+        elif cmd == 5:
             print("See you soon")
             break
         else:
@@ -172,6 +163,7 @@ def ask(method):
                 print("La clé doit être composée de lettres de l'alphabet")
                 continue
 
+
 ###############################################
 ####        Cesar encryption methods       ####
 ###############################################
@@ -192,20 +184,16 @@ def cesar_encrypt(chain, key):
         elif char in numbers:
             new_index = (numbers.index(char) + key) % 10
             crypted_message += numbers[new_index]
-        elif char in special_e:
-            new_index = (lowercase.index("e") + key) % 26
-            crypted_message += lowercase[new_index]
-        elif char in special_a:
-            new_index = (lowercase.index("a") + key) % 26
-            crypted_message += lowercase[new_index]
-        elif char in special_c:
-            new_index = (lowercase.index("c") + key) % 26
-            crypted_message += lowercase[new_index]
-        elif char in special_u:
-            new_index = (lowercase.index("u") + key) % 26
-            crypted_message += lowercase[new_index]
-        else:
-            crypted_message += char
+        elif char not in lowercase:
+            ok = False
+            for chain in special_char.keys():
+                if char in chain:
+                    new_index = (lowercase.index(special_char[chain]) + key) % 26
+                    crypted_message += lowercase[new_index]
+                    ok = not ok
+            if not ok:
+                crypted_message += char
+
     return crypted_message
 
 
@@ -217,14 +205,14 @@ def cesar_decrypt(chain, key):
 
     for char in chain:
         if char in lowercase:
-            new_indew = (lowercase.index(char) - key) % 26
-            decrypted_message += lowercase[new_indew]
+            new_index = (lowercase.index(char) - key) % 26
+            decrypted_message += lowercase[new_index]
         elif char in uppercase:
-            new_indew = (uppercase.index(char) - key) % 26
-            decrypted_message += uppercase[new_indew]
+            new_index = (uppercase.index(char) - key) % 26
+            decrypted_message += uppercase[new_index]
         elif char in numbers:
-            new_indew = (numbers.index(char) - key) % 10
-            decrypted_message += numbers[new_indew]
+            new_index = (numbers.index(char) - key) % 10
+            decrypted_message += numbers[new_index]
         else:
             decrypted_message += char
     return decrypted_message
@@ -245,80 +233,66 @@ def vigenere_encrypt(chain, key):
     # Receive chain(string) = string to encrypt
     # Receive key(string) = key with which "chain" will be encrypt
     # Output = "crypted_message"(string)
-    cmpt = 0
-    motcrypt = ''
-    key = key.lower()
+    cmpt = 0               # Set a var in order to know where we are in the key
+    crypted_message = ''
+    key = key.lower()      # We don't want upperccase in key -> it's easier
 
     for letters in chain:
         if letters in lowercase:
             number = (lowercase.index(letters) + lowercase.index(key[cmpt])) % 26
-            motcrypt += lowercase[number]
+            crypted_message += lowercase[number]
             cmpt = (cmpt + 1) % len(key)
         elif letters in uppercase:
             number = (uppercase.index(letters) + lowercase.index(key[cmpt])) % 26
-            motcrypt += uppercase[number]
+            crypted_message += uppercase[number]
             cmpt = (cmpt + 1) % len(key)
-        elif letters in special_e:
-            number = (lowercase.index("e") + lowercase.index(key[cmpt])) % 26
-            motcrypt += lowercase[number]
-            cmpt = (cmpt + 1) % len(key)
-        elif letters in special_a:
-            number = (lowercase.index("a") + lowercase.index(key[cmpt])) % 26
-            motcrypt += lowercase[number]
-            cmpt = (cmpt + 1) % len(key)
-        elif letters in special_c:
-            number = (lowercase.index("c") + lowercase.index(key[cmpt])) % 26
-            motcrypt += lowercase[number]
-            cmpt = (cmpt + 1) % len(key)
-        elif letters in special_u:
-            number = (lowercase.index("u") + lowercase.index(key[cmpt])) % 26
-            motcrypt += lowercase[number]
-            cmpt = (cmpt + 1) % len(key)
-        else:
-            motcrypt += letters
+        elif letters not in lowercase:
+            ok = False
+            for string in special_char.keys():
+                if letters in string:
+                    number = (lowercase.index(special_char[string]) + lowercase.index(key[cmpt])) % 26
+                    crypted_message += lowercase[number]
+                    cmpt = (cmpt + 1) % len(key)
+                    ok = not ok
+            if not ok:
+                crypted_message += letters
 
-
-
-    return motcrypt
+    return crypted_message
 
 def vigenere_decrypt(chain, key):
     # Receive chain(string) = string to decrypt
     # Receive key(string) = key with which "chain" will be decrypt
     # Output = "decrypted_message"(string)
     cmpt = 0
-    motcrypt = ''
+    decrypted_message = ''
     key = key.lower()
 
     for letters in chain:
         if letters in lowercase:
             number = (lowercase.index(letters) - lowercase.index(key[cmpt])) % 26
-            motcrypt += lowercase[number]
+            decrypted_message += lowercase[number]
             cmpt = (cmpt + 1) % len(key)
         elif letters in uppercase:
             number = (uppercase.index(letters) - lowercase.index(key[cmpt])) % 26
-            motcrypt += uppercase[number]
+            decrypted_message += uppercase[number]
             cmpt = (cmpt + 1) % len(key)
         else:
-            motcrypt += letters
+            decrypted_message += letters
 
+    return decrypted_message
 
-    return motcrypt
 
 ###################################################
 ####         Cryptanalyse statistique           ###
 ###################################################
 
-def crypto_analyse_stats(chain, error, method):
+def crypto_analyse_stats(chain, error):
     # Input: chain(string) -> message we have to analyse
     #        error(int) -> give the precision of the suggestion algorithm
-    #        method(string) -> is used to choose the correct database
     # Output: built table in console with 4 rows (Charactère, Effectif, Fréquence et Suggestion)
 
-    #Choose the database in function of the method used
-    if method == "c":
-        base = statistic_french_base_c
-    else:
-        base = statistic_french_base_v
+    #Declaration of the base we will use
+    base = statistic_french_base_c
 
     #Transform character into lowercase
     chain = chain.lower()
@@ -326,14 +300,14 @@ def crypto_analyse_stats(chain, error, method):
     #Creation of work table (statistic table)
     work_table = [["Charactères"], \
                   ["Effectifs  "], \
-                  ["Fréquence  "], \
+                  ["Fréquences "], \
                   ["Suggestion "]]
     total_effectif = 0
 
     #  Statistic Analysis  #
     for char in chain:
         if work_table[0].count(char) == 0:
-            if char != ' ' and not char in special_char:
+            if char != ' ' and not char in ponctuation:
                 work_table[0].append(char)
                 work_table[1].append(1)
         else:
@@ -382,6 +356,19 @@ def crypto_analyse_stats(chain, error, method):
                     char += ' ' * (5 - lenght)
             print("|", char, end='')
         print('||')
+    print('')
+
+    # Print the suggested message based only with the pic (we considered that the pic correspond to the 'e')
+    work_table[1].remove("Effectifs  ")  #Because for the following instruction str in not supported
+    pic = work_table[1].index(max(work_table[1]))
+    pic_index = lowercase.index(work_table[0][pic+1])
+    e_index = lowercase.index('e')
+    if e_index <= pic_index:
+        decalage = pic_index - e_index
+        print("Suggested message (based only on {0} frequence):".format(work_table[0][pic+1]), cesar_decrypt(chain, decalage), "   The key was:", decalage)
+    else:
+        decalage = 26 - e_index + pic_index
+        print("Suggested message (based only on {0} frequence):".format(work_table[0][pic+1]), cesar_decrypt(chain, decalage), "   The key was:", decalage)
 
 # Run
 user_interface()

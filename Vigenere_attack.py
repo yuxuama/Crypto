@@ -79,8 +79,6 @@ def vigenere_crack(chain=str):
         if factor_list_rough.count(number) > maximum[0]:
             maximum = [factor_list_rough.count(number), factors]
 
-    print(factor_list_rough)
-    print(repeated_chain)
     length_key = factor_list_rough[maximum[1]]
     
     for x in range(length_key):
@@ -90,10 +88,9 @@ def vigenere_crack(chain=str):
             if saved_frequences[0].count(char) == 0:
                 saved_frequences[0].append(char)
                 saved_frequences[1].append(treated_chain.count(char))
-        print(saved_frequences)
+        print("Only for debug:", saved_frequences)  #Only for debug if it is needed
         index_string = saved_frequences[1].index(max(saved_frequences[1]))
         max_char = saved_frequences[0][index_string]
-        print(max_char)
         if lowercase.index(max_char) >= lowercase.index('e'):
             index = lowercase.index(max_char) - lowercase.index('e')
             Key += (lowercase[index])
