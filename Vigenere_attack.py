@@ -9,6 +9,7 @@ lowercase = "abcdefghijklmnopqrstuvwxyz"
 
 statistic_french_base_c = [7.11, 1.14, 3.18, 3.67, 12.10, 1.11, 1.23, 1.11, 6.59, 0.34, 0.29, 4.96, 2.62, 6.39, 5.02, 2.49, 0.65, 6.07,6.51, 5.92, 4.49, 1.11, 0.17, 0.38, 0.46, 0.15]
 prime_numbers = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+espected_IC = 0.074
 
 def vigenere_crack(chain=str):
     # Input: "chain"(string) -> It is the Vigenere coded message
@@ -27,8 +28,8 @@ def vigenere_crack(chain=str):
 
     # Algorythm that remark the repetition of the text and compute their distance
     repeated_chain = [[], []]  # Var which will save the repeated chains and their distances
-    max_length = 5       # Set the max length of a repeated chain
-    min_length = 2      # Set the min length of a repeated chain
+    max_length = 6      # Set the max length of a repeated chain
+    min_length = 3     # Set the min length of a repeated chain
     n_value = 4          # Set the number of value we want per length
     for length in range(min_length, max_length+1): # Do the process for all size of sequences
         count = 0
@@ -59,16 +60,17 @@ def vigenere_crack(chain=str):
 
     ## Search for the length of the key  ##
     factor_list_rough = []
-    maximum = [0, 0]
+    maximum = [0, 0, 0]
     # Computing all possible factor
     for distance in range(len(repeated_chain[1])):
         factor = decompose(repeated_chain[1][distance])
         basic_len = len(factor)
         for number_index in range(basic_len):
             for number_index2 in range(basic_len):
-                new_factor = factor[number_index] * factor[number_index2]
-                if factor.count(new_factor) == 0:
-                    factor.append(new_factor)
+                if factor[number_index] != factor[number_index2]:
+                    new_factor = factor[number_index] * factor[number_index2]
+                    if factor.count(new_factor) == 0:
+                        factor.append(new_factor)
         sort(factor)
         for number in factor:
             factor_list_rough.append(number)
@@ -77,8 +79,11 @@ def vigenere_crack(chain=str):
     for factors in range(len(factor_list_rough)):  
         number = factor_list_rough[factors]
         if factor_list_rough.count(number) > maximum[0]:
-            maximum = [factor_list_rough.count(number), factors]
-
+            maximum = [factor_list_rough.count(number), factors, number]
+        elif factor_list_rough.count(number) == maximum[0]:
+            better_factor = optimization_with_IC(sorted_chain, [number, maximum[2]])
+            if better_factor != maximum[2]:
+                maximum = [factor_list_rough.count(number), factors, number]
     length_key = factor_list_rough[maximum[1]]
     
     for x in range(length_key):
@@ -109,7 +114,8 @@ def decompose(n=int):
     count = 0
     while n > 2:
         if count == 100:
-            return [n]
+            decomposed_n.append(n)
+            return decomposed_n
         number = prime_numbers[diviseur_index]
         if n % number == 0:
             decomposed_n.append(number)
@@ -130,3 +136,24 @@ def sort(table):
             while table.count(things) > 1:
                 table.remove(things)
     return table
+
+# Method call only if needed
+# It allows to choose the factor that is the closest of the IC for french (the best of two equal frequenced factor)
+def optimization_with_IC(chain, doubt):  # This fonction allows us to choose between prime number or multiple
+    # chain(string) -> analysed chain
+    # doubt(list) -> list of all factors we have a doubt on
+    best_IC = []
+    for nfactor in range(len(doubt)):
+        size = doubt[nfactor]
+        if size < len(chain)/size:
+            treated_chain = ''.join(chain[b*size] for b in range(int(len(chain)/size)))
+        else:
+            continue
+        n = len(treated_chain)
+        IC = sum(((treated_chain.count(lowercase[x]) - 1 )*treated_chain.count(lowercase[x]) / (n * (n - 1)) for x in range(26)))
+        best_IC.append(IC / espected_IC)
+    if len(best_IC) > 0:
+        return doubt[best_IC.index(max(best_IC))]
+    else:
+        return 0
+

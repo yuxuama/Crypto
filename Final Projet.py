@@ -11,9 +11,9 @@ from Vigenere_attack import vigenere_crack
 # Declaration of dedicated alphabet
 lowercase = "abcdefghijklmnopqrstuvwxyz"
 uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-ponctuation = "!?:;.,'-’"
 special_char = dict(àâÀ="a", éèêÉÈ="e", ùûÙ="u", çÇ="c", î='i', ôÔ='o')
 numbers = "0123456789"
+ponctuation = "!?:;.,'-’"
 
 # French data base for statistic attack:
 statistic_french_base_c = [7.11, 1.14, 3.18, 3.67, 12.10, 1.11, 1.23, 1.11, 6.59, 0.34, 0.29, 4.96, 2.62, 6.39, 5.02, 2.49, 0.65, 6.07,6.51, 5.92, 4.49, 1.11, 0.17, 0.38, 0.46, 0.15]
@@ -184,7 +184,7 @@ def cesar_encrypt(chain, key):
         elif char in numbers:
             new_index = (numbers.index(char) + key) % 10
             crypted_message += numbers[new_index]
-        elif char not in lowercase:
+        else:
             ok = False
             for chain in special_char.keys():
                 if char in chain:
@@ -235,7 +235,7 @@ def vigenere_encrypt(chain, key):
     # Output = "crypted_message"(string)
     cmpt = 0               # Set a var in order to know where we are in the key
     crypted_message = ''
-    key = key.lower()      # We don't want upperccase in key -> it's easier
+    key = key.lower()      # We don't want uppercase in key -> it's easier
 
     for letters in chain:
         if letters in lowercase:
@@ -246,7 +246,7 @@ def vigenere_encrypt(chain, key):
             number = (uppercase.index(letters) + lowercase.index(key[cmpt])) % 26
             crypted_message += uppercase[number]
             cmpt = (cmpt + 1) % len(key)
-        elif letters not in lowercase:
+        else:
             ok = False
             for string in special_char.keys():
                 if letters in string:
@@ -313,14 +313,11 @@ def crypto_analyse_stats(chain, error):
         else:
             index = work_table[0].index(char)
             work_table[1][index] += 1
+            total_effectif += 1
     #Computing frequences (via total effectif)
-    for i in range(2):
-        for number in work_table[1]:
-            if type(number) is not str:
-                if i == 0:
-                    total_effectif += number
-                else:
-                    work_table[2].append(round((number / total_effectif) * 100, 2))
+    for number in work_table[1]:
+        if type(number) is not str:
+            work_table[2].append(round((number / total_effectif) * 100, 2))
 
     # Sort of the "worktable"  characteres in order to save only those which are in "lowercase"
 
