@@ -55,16 +55,16 @@ def cesar_interface():
     while 1:
         cmd = int(input(">>> "))
         if cmd == 1:
-            infos = ask("cesar")
+            infos = ask("cesar", "crypt")
             print("Crypted message: ", cesar_encrypt(infos[0], infos[1]))
         elif cmd == 2:
-            infos = ask("cesar")
+            infos = ask("cesar", "decrypt")
             print("Decrypted message: ", cesar_decrypt(infos[0], infos[1]))
         elif cmd == 3:
-            infos = input("Crypted message: ")
+            infos = ask("cesar", "bf")
             cesar_bf(infos)
         elif cmd == 4:
-            infos = input("Crypted message: ")
+            infos = ask("cesar", "ana")
             crypto_analyse_stats(infos, 5)
         elif cmd == 5:
             user_interface()
@@ -89,13 +89,13 @@ def vigenere_interface():
     while 1:
         cmd = int(input(">>> "))
         if cmd == 1:
-            infos = ask("v")
+            infos = ask("v", "crypt")
             print("Crypted message: ", vigenere_encrypt(infos[0], infos[1]))
         elif cmd == 2:
-            infos = ask("v")
+            infos = ask("v", "decrypt")
             print("Decrypted message: ", vigenere_decrypt(infos[0], infos[1]))
         elif cmd == 3:
-            info = input("Crypted message: ")
+            info = ask("v", "analysis")
             key = vigenere_crack(info)
             print("The key was: ", key)
             print("Decrypted message: ", vigenere_decrypt(info, key))
@@ -120,10 +120,10 @@ def beaufort_interface():
     while 1:
         cmd = int(input(">>> "))
         if cmd == 1:
-            infos = ask("v")
+            infos = ask("v", "crypt")
             print("Crypted message: ", vigenere_decrypt(infos[0], infos[1]))  # We've just inverted the two method of vigenere in order to compute Beaufort's ones
         elif cmd == 2:
-            infos = ask("v")
+            infos = ask("v", "decrypt")
             print("Decrypted message: ", vigenere_encrypt(infos[0], infos[1]))
         elif cmd == 3:
             user_interface()
@@ -135,33 +135,44 @@ def beaufort_interface():
             print("Invalid command")
 
 # Input method  
-def ask(method):
-    # Receive chain (method) -> it identifies rather cesar method or an other
+def ask(method, type):
+    # Input: method(string) -> it identifies rather cesar method or an other
+    #        type(string) -> identifies crypting, decrypting and analysis
     while 1:
-        message = input("Text: ")
-        key = input("Key: ")
         if method == "cesar":
-            try:
-                key = int(key)
-                if not 0 < key < 26:
+            if type == "crypt" or type == "decrypt":
+                message = input("Text: ")
+                key = input("Key: ")
+                try:
+                    key = int(key)
+                    if not 0 < key < 26:
+                        print("La clé doit être comprise entre 0 et 25")
+                        continue
+                    return message, key
+                except ValueError:
                     print("La clé doit être comprise entre 0 et 25")
                     continue
-                return message, key
-            except ValueError:
-                print("La clé doit être comprise entre 0 et 25")
-                continue
-        else:
-            cmpt = 0
-            for letter in key:
-                if letter in lowercase:
-                    cmpt += 1
-                elif letter in uppercase:
-                    cmpt += 1
-            if cmpt == len(key):
-                return message, key
             else:
-                print("La clé doit être composée de lettres de l'alphabet")
-                continue
+                message = input("Crypted text: ")
+                return message
+        else:
+            if type == "crypt" or type == "decrypt":
+                message = input("Text: ")
+                key = input("Key: ")
+                cmpt = 0
+                for letter in key:
+                    if letter in lowercase:
+                        cmpt += 1
+                    elif letter in uppercase:
+                        cmpt += 1
+                if cmpt == len(key):
+                    return message, key
+                else:
+                    print("La clé doit être composée de lettres de l'alphabet")
+                    continue
+            else:
+                message = input("Crypted text: ")
+                return message
 
 
 ###############################################

@@ -67,7 +67,7 @@ def vigenere_crack(chain=str):
         basic_len = len(factor)
         for number_index in range(basic_len):
             for number_index2 in range(basic_len):
-                if factor[number_index] != factor[number_index2]:
+                if number_index != number_index2:
                     new_factor = factor[number_index] * factor[number_index2]
                     if factor.count(new_factor) == 0:
                         factor.append(new_factor)
@@ -84,6 +84,7 @@ def vigenere_crack(chain=str):
             better_factor = optimization_with_IC(sorted_chain, [number, maximum[2]])
             if better_factor != maximum[2]:
                 maximum = [factor_list_rough.count(number), factors, number]
+
     length_key = factor_list_rough[maximum[1]]
     
     for x in range(length_key):
@@ -112,7 +113,7 @@ def decompose(n=int):
     diviseur_index = 0
     decomposed_n = []
     count = 0
-    while n > 2:
+    while n > 1:
         if count == 100:
             decomposed_n.append(n)
             return decomposed_n
@@ -156,4 +157,3 @@ def optimization_with_IC(chain, doubt):  # This fonction allows us to choose bet
         return doubt[best_IC.index(max(best_IC))]
     else:
         return 0
-
